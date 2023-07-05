@@ -44,7 +44,7 @@ def write_to_file():
     is_ok = messagebox.askokcancel(title=website_input.get(), message=f"These are the details entered: "
                                                               f"\nEmail: {email_user_input.get()}"
                                                               f"\nPassword: {password_input.get()}"
-                           )
+                                )
 
 
     if is_ok:
@@ -65,6 +65,32 @@ def write_to_file():
             website_input.delete(0, 'end')
             password_input.delete(0, 'end')
 
+
+# ---------------------------- LOOK UP PASSWORD ------------------------------- #
+
+def search_pass():
+    website = website_input.get()
+    filename = "data.json"
+    if len(website) < 1:
+       return messagebox.showinfo("Information", "Please make sure all info is entered.")
+
+    with open(filename, "r") as file:
+        data = json.load(file)
+
+    if not website not in data:
+        return messagebox.showinfo("Information", f"{website} does not exist create or try again")
+
+    try:
+        with open(filename, "r") as file:
+            data = json.load(file)
+            if not website not in data:
+                return messagebox.showinfo("Information", f"{website} does not exist create or try again")
+            site_data = data[website]
+
+    except FileNotFoundError:
+        write_to_file()
+    else:
+        messagebox.showinfo("Information", f"email: {site_data['email']} password: {site_data['password']}")
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -92,7 +118,7 @@ password_label.grid(column=0, row=3)
 
 # input boxes
 
-website_input = Entry(width=35)
+website_input = Entry(width=21)
 print(website_input.get())
 website_input.grid(column=1, row=1, columnspan=2, sticky="w")
 website_input.focus()
@@ -114,7 +140,8 @@ generate_pass_button.grid(column=2, row=3)
 add_button = Button(text="Add", width=36, highlightthickness=0, command=write_to_file)
 add_button.grid(column=1, row=4, columnspan=2)
 
-
+search_button = Button(text='Search',width=10, command=search_pass)
+search_button.grid(column=2, row=1)
 
 
 window.mainloop()

@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox
 from random import choice, randint, shuffle
 import pyperclip
+import json
 
 FONT_TYPE = "Courier"
 FONT_SIZE = 15
@@ -26,11 +27,18 @@ def generate_password():
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 
 def write_to_file():
-    filename = "data.txt"
-    entries = [website_input.get(), email_user_input.get(), password_input.get()]
-    content = " | ".join(entries)
+    filename = "data.json"
+    website = website_input.get()
+    password = password_input.get()
+    email = email_user_input.get()
+    new_data = {
+        website: {
+            "email": email,
+            "password": password,
+        }
+    }
 
-    if len(website_input.get()) < 1 or len(password_input.get()) < 1:
+    if len(website) < 1 or len(password) < 1:
        return messagebox.showinfo("Information", "Please make sure all info is entered.")
 
     is_ok = messagebox.askokcancel(title=website_input.get(), message=f"These are the details entered: "
@@ -40,11 +48,22 @@ def write_to_file():
 
 
     if is_ok:
-        with open(filename, "a") as file:
-            file.write(content + "\n")
+        try:
+            with open(filename, "r") as file:
+                # json.dump(new_data, file)
+                data = json.load(file)
 
-        website_input.delete(0, 'end')
-        password_input.delete(0, 'end')
+        except FileNotFoundError:
+            with open(filename, "w") as file:
+                json.dump(data, file, indent=4)
+                print(data)
+        else:
+            data.update(new_data)
+            with open(filename, "w") as data_file:
+                json.dump(data, data_file, indent=4)
+        finally:
+            website_input.delete(0, 'end')
+            password_input.delete(0, 'end')
 
 
 
